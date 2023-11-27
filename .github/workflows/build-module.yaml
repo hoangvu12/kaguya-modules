@@ -24,7 +24,7 @@ jobs:
         run: npm install
 
       - name: Build modules and index
-        run: npm run module:index --index-name=${{ env.REPOSITORY_NAME }} --index-author=${{github.repository_owner}}
+        run: npm run module:index -- --index-name=${{ env.REPOSITORY_NAME }} --index-author=${{github.repository_owner}}
 
       - name: Move to output branch
         run: |
