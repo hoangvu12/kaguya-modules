@@ -1,8 +1,8 @@
-name: Upload Output Files
+name: Build module index
 
 on:
   push:
-    branches: [master]
+    branches: [main]
 
 jobs:
   upload:
