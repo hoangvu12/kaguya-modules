@@ -31,4 +31,4 @@ jobs:
           git checkout -B modules
           git add output/*
           git commit -m "Update module files"
-          git push origin modules
+          git push origin modules -f
