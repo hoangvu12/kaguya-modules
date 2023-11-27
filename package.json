@@ -1,0 +1,67 @@
+{
+  "name": "typescript-template",
+  "version": "1.0.7",
+  "description": "A complete Node.js project template using TypeScript and following general best practices.",
+  "keywords": [
+    "typescript",
+    "template"
+  ],
+  "author": {
+    "name": "Chris Wells",
+    "url": "https://chriswells.io"
+  },
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chriswells0/node-typescript-template.git"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "build": "npm run clean && npm run lint && tsc",
+    "clean": "node -e \"var { rmdirSync, existsSync } = require('fs'), path = require('path'); ['./.nyc_output', './coverage', './dist'].forEach(fPath => {if (existsSync(path.join(__dirname, fPath))) rmdirSync(path.join(__dirname, fPath), { recursive: true })}); process.exit(0);\"",
+    "clean:all": "npm run clean && (rm -r ./node_modules || true)",
+    "lint": "eslint --ext .ts --fix src/**/*.ts",
+    "preversion": "npm run build",
+    "prepare": "npm run build",
+    "serve": "nodemon ./src/index.ts",
+    "upgrade": "npx npm-check -u",
+    "watch": "tsc -w -p tsconfig.json",
+    "module:validate": "npm run build && node ./dist/scripts/module-validate.js",
+    "module:test": "npm run build && node ./dist/scripts/module-test.js",
+    "module:build": "npm run build && node ./dist/scripts/module-build.js",
+    "module:index": "npm run build && node ./dist/scripts/module-index.js"
+  },
+  "devDependencies": {
+    "@total-typescript/ts-reset": "^0.5.1",
+    "@types/jsdom": "^21.1.6",
+    "@types/node": "^20.4.1",
+    "@types/prompts": "^2.4.9",
+    "@types/web": "^0.0.119",
+    "@typescript-eslint/eslint-plugin": "^5.61.0",
+    "@typescript-eslint/parser": "^5.61.0",
+    "eslint": "^8.44.0",
+    "nodemon": "^3.0.1",
+    "nyc": "^15.1.0",
+    "source-map-support": "^0.5.21",
+    "ts-node": "^10.9.1",
+    "@types/archiver": "^6.0.2",
+    "typescript": "^5.1.6"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "dependencies": {
+    "archiver": "^6.0.1",
+    "axios": "^1.6.2",
+    "jsdom": "^22.1.0",
+    "ora": "^5.4.1",
+    "prompts": "^2.4.2",
+    "zod": "^3.22.4"
+  }
+}

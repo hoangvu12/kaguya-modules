@@ -1,0 +1,12 @@
+{
+    "id": "anify",
+    "name": "Anify",
+    "version": "0.0.1",
+    "languages": [
+        "English"
+    ],
+    "type": "anime",
+    "info": {
+        "author": "hoangvu12"
+    }
+}

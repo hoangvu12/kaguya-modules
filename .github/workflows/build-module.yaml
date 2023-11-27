@@ -1,0 +1,34 @@
+name: Build module index
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@github.com"
+
+      - name: Get repo name
+        run: echo "REPOSITORY_NAME=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build modules and index
+        run: npm run module:index --index-name=${{ env.REPOSITORY_NAME }} --index-author=${{github.repository_owner}}
+
+      - name: Move to output branch
+        run: |
+          git checkout -B modules
+          git add output/*
+          git commit -m "Update module files"
+          git push origin modules
