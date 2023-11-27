@@ -1,0 +1,19 @@
+{
+    "id": "crunchyroll",
+    "name": "Crunchyroll",
+    "version": "0.0.1",
+    "languages": [
+        "English",
+        "العربية",
+        "Deutsch",
+        "Español",
+        "Français",
+        "Italiano",
+        "Português",
+        "Русский"
+    ],
+    "type": "anime",
+    "info": {
+        "author": "hoangvu12"
+    }
+}

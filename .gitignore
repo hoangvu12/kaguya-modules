@@ -6,3 +6,5 @@ node_modules/
 
 # Project files:
 *.sublime-*
+
+output

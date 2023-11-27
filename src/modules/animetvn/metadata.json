@@ -1,0 +1,12 @@
+{
+    "id": "animetvn",
+    "name": "AnimeTVN",
+    "version": "0.0.1",
+    "languages": [
+        "Vietnamese"
+    ],
+    "type": "anime",
+    "info": {
+        "author": "hoangvu12"
+    }
+}
