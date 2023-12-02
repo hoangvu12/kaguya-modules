@@ -31,10 +31,11 @@ const parseArg = (args: string[], providedArg: string) => {
 
 const indexName = parseArg(args, "index-name");
 const indexAuthor = parseArg(args, "index-author");
+const indexURLPattern = parseArg(args, "index-url-pattern");
 
-if (!indexName || !indexAuthor) {
+if (!indexName || !indexAuthor || !indexURLPattern) {
   console.log(
-    "Index name (--index-name) and author (--index-author) are required."
+    "Index name (--index-name) and author (--index-author) and URL Pattern (--index-url-pattern) are required."
   );
   process.exit(1);
 }
@@ -59,6 +60,17 @@ const buildModule = async (module_id: string) => {
       log(`Failed to build module (${err.message})`);
     },
   });
+};
+
+const parseUrl = (module: z.infer<typeof ModuleSchema>) => {
+  let url = indexURLPattern.replace("{{module_id}}", module.id);
+
+  url = url.replace("{{module_name}}", module.name);
+  url = url.replace("{{module_version}}", module.version);
+  url = url.replace("{{module_type}}", module.type);
+  url = url.replace("{{module_author}}", module.info.author);
+
+  return url;
 };
 
 const main = async () => {
@@ -94,7 +106,12 @@ const main = async () => {
       break;
     }
 
-    indexJSON.modules.push(validateResult.data);
+    const url = parseUrl(validateResult.data);
+
+    indexJSON.modules.push({
+      ...validateResult.data,
+      url,
+    });
   }
 
   fs.promises.writeFile(

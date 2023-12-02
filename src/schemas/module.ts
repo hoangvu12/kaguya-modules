@@ -9,6 +9,7 @@ const ModuleSchema = z.object({
     author: z.string(),
   }),
   type: z.enum(["anime", "manga"]),
+  url: z.string().url().optional(),
 });
 
 export default ModuleSchema;
