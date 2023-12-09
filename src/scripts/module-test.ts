@@ -10,6 +10,8 @@ import { EpisodeSchema } from "../schemas/episode";
 import { SearchResultSchema } from "../schemas/search-result";
 import { VideoServerSchema } from "../schemas/video-server";
 import { VideoContainerSchema } from "../schemas/video-container";
+import prompts from "prompts";
+import axios from "axios";
 
 const GetIdResultSchema = z.object({
   data: z.string(),
@@ -18,18 +20,6 @@ const GetIdResultSchema = z.object({
 const GetEpisodesResultSchema = z.array(EpisodeSchema).nonempty();
 const GetSearchResultSchema = z.array(SearchResultSchema);
 const GetVideoServersResultSchema = z.array(VideoServerSchema).nonempty();
-
-const getIdResultParams = {
-  media: {
-    id: 21,
-    title: {
-      romaji: "ONE PIECE",
-      english: "ONE PIECE",
-      native: "ONE PIECE",
-      userPreferred: "ONE PIECE",
-    },
-  },
-};
 
 const checkIndexFile = (moduleFolder: string) => {
   const file = path.join(moduleFolder, "index.js");
@@ -45,12 +35,15 @@ const checkIndexFile = (moduleFolder: string) => {
   return true;
 };
 
-const checkGetIdFunction = async (executeCode: ExecuteCodeFunction) => {
+const checkGetIdFunction = async (
+  executeCode: ExecuteCodeFunction,
+  params: any
+) => {
   const spinner = ora("anime.getId").start();
 
   const data = await executeCode<z.infer<typeof GetIdResultSchema>>(
     "anime.getId",
-    getIdResultParams
+    params
   );
 
   const validation = GetIdResultSchema.safeParse(data);
@@ -172,8 +165,58 @@ const checkVideoContainer = async (
   return validation.data;
 };
 
+const getAnilistMedia = async (mediaId: number) => {
+  const spinner = ora("Get media from Anilist").start();
+
+  try {
+    const { data } = await axios({
+      url: "https://graphql.anilist.co",
+      method: "post",
+      data: {
+        query: `
+          query ($id: Int) {
+            Media (id: $id, type: ANIME) {
+              id
+              title {
+                romaji
+                english
+                native
+                userPreferred
+              }
+            }
+          }
+        `,
+        variables: {
+          id: mediaId,
+        },
+      },
+    });
+
+    spinner.succeed();
+
+    return data?.data?.Media;
+  } catch (err) {
+    spinner.fail();
+
+    console.error(err);
+
+    return undefined;
+  }
+};
+
 const main = async () => {
   const module_id = await inputModuleId();
+
+  const { media_id } = await prompts({
+    name: "media_id",
+    message: "Write the media id (AniList) to test the module",
+    type: "number",
+  });
+
+  const media = await getAnilistMedia(media_id);
+
+  console.log(media);
+
   const moduleFolder = await getModuleFolder(module_id);
   const indexFile = path.join(moduleFolder, "index.js");
 
@@ -195,7 +238,7 @@ const main = async () => {
 
   injectCode(indexFileContent);
 
-  const animeId = await checkGetIdFunction(executeCode);
+  const animeId = await checkGetIdFunction(executeCode, { media });
 
   if (!animeId) {
     return;
