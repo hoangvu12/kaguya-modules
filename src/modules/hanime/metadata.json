@@ -1,0 +1,12 @@
+{
+    "id": "hanime",
+    "name": "HAnime",
+    "version": "0.0.1",
+    "languages": [
+        "English"
+    ],
+    "type": "anime",
+    "info": {
+        "author": "hoangvu12"
+    }
+}
