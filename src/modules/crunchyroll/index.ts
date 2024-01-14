@@ -4,7 +4,7 @@ import { Anime, VideoContainer } from "../../types";
 const CrunchyrollClient = class {
   USER_AGENT = "Crunchyroll/3.28.0 Android/9 okhttp/4.9.2";
   BASIC_TOKEN =
-    "dnZnbnJybGdnc2pfZl90MXJmZ2o6TEhnWXNGYzh0X0ZhNkJhQmFuS0pTempnR01UUUt3QnI=";
+    "b2VkYXJteHN0bGgxanZhd2ltbnE6OWxFaHZIWkpEMzJqdVY1ZFc5Vk9TNTdkb3BkSnBnbzE=";
   LOCALES = [
     "en-US",
     "de-DE",
