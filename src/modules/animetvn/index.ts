@@ -30,7 +30,7 @@ type Server = {
 };
 
 const anime: WindowAnime = {
-  baseUrl: "https://animetvn2.com",
+  baseUrl: "https://animetvn3.com",
   csrf: "",
   cookieString: "",
   getId: async ({ media }) => {
