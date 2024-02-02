@@ -85,7 +85,7 @@ const anime = {
             ? `https://${source.file}`
             : source.file,
           headers: {
-            referer: "https://animevietsub.fan",
+            referer: anime.baseUrl,
           },
         },
         quality: source.label,
