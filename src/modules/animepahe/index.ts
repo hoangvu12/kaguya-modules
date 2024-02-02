@@ -38,9 +38,12 @@ const anime: WindowAnime = {
   },
 
   getEpisodes: async ({ animeId }) => {
-    const { data: response } = await sendRequest(
-      `${anime.baseUrl}/a/${animeId}`
-    );
+    const { data: response } = await sendRequest({
+      baseURL: `${anime.baseUrl}/a/${animeId}`,
+      headers: {
+        cookie: "__ddgid_=; __ddg2_=; __ddg1_=",
+      },
+    });
 
     const animeSession = anime._parseBetween(response, 'let id = "', '"');
 
@@ -64,7 +67,12 @@ const anime: WindowAnime = {
 
     const url = `${anime.baseUrl}/play/${extraData.animeSession}/${episodeId}`;
 
-    const { data: response } = await sendRequest(url);
+    const { data: response } = await sendRequest({
+      url,
+      headers: {
+        cookie: "__ddgid_=; __ddg2_=; __ddg1_=",
+      },
+    });
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(response, "text/html");
@@ -99,7 +107,8 @@ const anime: WindowAnime = {
     const { data: response } = await sendRequest({
       url: extraData.embed,
       headers: {
-        referer: "https://kwik.cx/",
+        referer: "https://kwik.si/",
+        cookie: "__ddgid_=; __ddg2_=; __ddg1_=",
       },
     });
 
@@ -121,7 +130,7 @@ const anime: WindowAnime = {
           file: {
             url: stream,
             headers: {
-              referer: "https://kwik.cx/",
+              referer: "https://kwik.si/",
             },
           },
         },
@@ -139,9 +148,12 @@ const anime: WindowAnime = {
     const episodes: Episode[] = [];
 
     const load = async (page = 1): Promise<Episode[]> => {
-      const { data: episodeResponse } = await sendRequest(
-        `${anime.baseUrl}/api?m=release&id=${animeSession}&sort=episode_asc&page=${page}`
-      );
+      const { data: episodeResponse } = await sendRequest({
+        baseURL: `${anime.baseUrl}/api?m=release&id=${animeSession}&sort=episode_asc&page=${page}`,
+        headers: {
+          cookie: "__ddgid_=; __ddg2_=; __ddg1_=",
+        },
+      });
 
       if (episodeResponse?.data?.length) {
         episodes.push(...episodeResponse.data);
@@ -157,9 +169,12 @@ const anime: WindowAnime = {
   _search: async (query) => {
     const encodedQuery = encodeURIComponent(query);
 
-    const { data: response } = await sendRequest(
-      `${anime.baseUrl}/api?m=search&q=${encodedQuery}`
-    );
+    const { data: response } = await sendRequest({
+      baseURL: `${anime.baseUrl}/api?m=search&q=${encodedQuery}`,
+      headers: {
+        cookie: "__ddgid_=; __ddg2_=; __ddg1_=",
+      },
+    });
 
     if (!response?.data?.length) return [];
 
