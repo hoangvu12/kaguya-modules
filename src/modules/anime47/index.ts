@@ -6,8 +6,7 @@ import {
   VideoServer,
 } from "../../types";
 
-const allowedServers = ["2", "3", "9"];
-
+const allowedServers = ["2", "3", "4", "9"];
 interface WindowAnime extends Anime {
   baseUrl: string;
   _totalSearch: (media: {
@@ -181,8 +180,42 @@ const anime: WindowAnime = {
       return sendResponse(container);
     }
 
+    if (id === "4") {
+      const videoUrl = anime._decrypt(
+        anime._parseBetween(data, 'atob("', '")')
+      );
+
+      if (!videoUrl) {
+        return sendResponse(container);
+      }
+
+      container.videos.push({
+        file: { url: videoUrl },
+        format: "hls",
+      });
+
+      return sendResponse(container);
+    }
+
     // Lo
     if (id === "3") {
+      if (data.includes("thanhhoa")) {
+        const videoUrl = anime._decrypt(
+          anime._parseBetween(data, 'atob("', '")')
+        );
+
+        if (!videoUrl) {
+          return sendResponse(container);
+        }
+
+        container.videos.push({
+          file: { url: videoUrl },
+          format: "hls",
+        });
+
+        return sendResponse(container);
+      }
+
       const iframeUrl = anime
         ._parseBetween(data, 'src=\\"', '\\"')
         .replace(/\\\//g, "/");
