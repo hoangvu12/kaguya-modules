@@ -361,9 +361,7 @@ const anime: WindowAnime = {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      data: new URLSearchParams({
-        query: filemoonHTML,
-      }),
+      data: `query=${encodeURIComponent(filemoonHTML)}`,
     });
 
     if (!source?.url) {
