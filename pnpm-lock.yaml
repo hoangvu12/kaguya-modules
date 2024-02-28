@@ -7,7 +7,7 @@ settings:
 dependencies:
   archiver:
     specifier: ^6.0.1
-    version: 6.0.1
+    version: 6.0.2
   axios:
     specifier: ^1.6.2
     version: 1.6.7
@@ -717,8 +717,8 @@ packages:
       readable-stream: 3.6.2
     dev: false
 
-  /archiver@6.0.1:
-    resolution: {integrity: sha512-CXGy4poOLBKptiZH//VlWdFuUC1RESbdZjGjILwBuZ73P7WkAUN0htfSfBq/7k6FRFlpu7bg4JOkj1vU9G6jcQ==}
+  /archiver@6.0.2:
+    resolution: {integrity: sha512-UQ/2nW7NMl1G+1UnrLypQw1VdT9XZg/ECcKPq7l+STzStrSivFIXIp34D8M5zeNGW5NoOupdYCHv6VySCPNNlw==}
     engines: {node: '>= 12.0.0'}
     dependencies:
       archiver-utils: 4.0.1
