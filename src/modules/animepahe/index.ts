@@ -39,10 +39,11 @@ const anime: WindowAnime = {
 
   getEpisodes: async ({ animeId }) => {
     const { data: response } = await sendRequest({
-      baseURL: `${anime.baseUrl}/a/${animeId}`,
+      url: `${anime.baseUrl}/a/${animeId}`,
       headers: {
         cookie: "__ddgid_=; __ddg2_=; __ddg1_=",
       },
+      withCredentials: false,
     });
 
     const animeSession = anime._parseBetween(response, 'let id = "', '"');
@@ -72,6 +73,7 @@ const anime: WindowAnime = {
       headers: {
         cookie: "__ddgid_=; __ddg2_=; __ddg1_=",
       },
+      withCredentials: false,
     });
 
     const parser = new DOMParser();
@@ -110,6 +112,7 @@ const anime: WindowAnime = {
         referer: "https://kwik.si/",
         cookie: "__ddgid_=; __ddg2_=; __ddg1_=",
       },
+      withCredentials: false,
     });
 
     const packedString =
@@ -149,10 +152,11 @@ const anime: WindowAnime = {
 
     const load = async (page = 1): Promise<Episode[]> => {
       const { data: episodeResponse } = await sendRequest({
-        baseURL: `${anime.baseUrl}/api?m=release&id=${animeSession}&sort=episode_asc&page=${page}`,
+        url: `${anime.baseUrl}/api?m=release&id=${animeSession}&sort=episode_asc&page=${page}`,
         headers: {
           cookie: "__ddgid_=; __ddg2_=; __ddg1_=",
         },
+        withCredentials: false,
       });
 
       if (episodeResponse?.data?.length) {
@@ -170,10 +174,11 @@ const anime: WindowAnime = {
     const encodedQuery = encodeURIComponent(query);
 
     const { data: response } = await sendRequest({
-      baseURL: `${anime.baseUrl}/api?m=search&q=${encodedQuery}`,
+      url: `${anime.baseUrl}/api?m=search&q=${encodedQuery}`,
       headers: {
         cookie: "__ddgid_=; __ddg2_=; __ddg1_=",
       },
+      withCredentials: false,
     });
 
     if (!response?.data?.length) return [];
