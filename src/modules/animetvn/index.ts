@@ -120,6 +120,7 @@ const anime: WindowAnime = {
         "x-csrf-token": anime.csrf,
         cookie: anime.cookieString,
       },
+      withCredentials: false,
     });
 
     if (!data?.success) {
@@ -163,6 +164,7 @@ const anime: WindowAnime = {
         id,
         link,
       }),
+      withCredentials: false,
     });
 
     if (name === "TVN") {
@@ -253,6 +255,7 @@ const anime: WindowAnime = {
         "x-csrf-token": anime.csrf,
         cookie: anime.cookieString,
       },
+      withCredentials: false,
     });
 
     const parser = new DOMParser();
