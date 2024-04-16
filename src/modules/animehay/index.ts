@@ -20,7 +20,7 @@ interface WindowAnime extends Anime {
 }
 
 const anime: WindowAnime = {
-  baseUrl: "https://animehay.city",
+  baseUrl: "https://animehay.blog",
 
   getId: async ({ media }) => {
     const searchResults = await anime._totalSearch(media);

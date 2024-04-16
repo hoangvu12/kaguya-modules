@@ -25,7 +25,7 @@ interface WindowAnime extends Anime {
 }
 
 const anime: WindowAnime = {
-  baseUrl: "https://ihentai.de",
+  baseUrl: "https://hentaiz.bz",
   getId: async ({ media }) => {
     const searchResults = await anime._totalSearch(media);
 

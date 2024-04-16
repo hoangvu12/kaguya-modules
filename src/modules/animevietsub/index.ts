@@ -3,7 +3,7 @@
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const anime = {
-  baseUrl: "https://animevietsub.io",
+  baseUrl: "https://animevietsub.day",
   getId: async ({ media }) => {
     const searchResults = await anime._totalSearch(media);
 
