@@ -76,6 +76,14 @@ const parseUrl = (module: z.infer<typeof ModuleSchema>) => {
 const main = async () => {
   const moduleIds = await getModuleIds();
 
+  const outputFolder = handlePath("./output", process.cwd());
+
+  if (fs.existsSync(outputFolder)) {
+    await fs.promises.rm(outputFolder, { recursive: true, force: true });
+
+    await fs.promises.mkdir(outputFolder);
+  }
+
   await Promise.all(moduleIds.map(buildModule));
 
   const indexJSON: {
