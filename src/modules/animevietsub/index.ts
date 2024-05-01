@@ -3,13 +3,30 @@
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const anime = {
-  baseUrl: "https://animevietsub.day",
+  hasGotBaseUrl: false,
+  baseUrl: "",
+  getBaseUrl: async () => {
+    if (anime.hasGotBaseUrl) return;
+
+    const { request } = await sendRequest("https://bit.ly/animevietsubtv");
+
+    let href = request.responseURL;
+
+    if (href.endsWith("/")) href = href.slice(0, -1);
+
+    anime.baseUrl = href;
+    anime.hasGotBaseUrl = true;
+  },
   getId: async ({ media }) => {
+    await anime.getBaseUrl();
+
     const searchResults = await anime._totalSearch(media);
 
     sendResponse({ data: searchResults?.[0]?.id, extraData: {} });
   },
   getEpisodes: async ({ animeId }) => {
+    await anime.getBaseUrl();
+
     const { data: response } = await sendRequest(
       `${anime.baseUrl}/phim/a-a${animeId}/xem-phim.html`
     );
@@ -33,11 +50,15 @@ const anime = {
     sendResponse(episodes);
   },
   search: async ({ query }) => {
+    await anime.getBaseUrl();
+
     const searchResults = await anime._search(query);
 
     sendResponse(searchResults);
   },
   async loadVideoServers({ episodeId }) {
+    await anime.getBaseUrl();
+
     const { data } = await sendRequest({
       url: `${anime.baseUrl}/ajax/player?v=2019a`,
       data: `episodeId=${episodeId}&backup=1`,
@@ -65,6 +86,8 @@ const anime = {
   },
 
   async loadVideoContainer({ extraData }) {
+    await anime.getBaseUrl();
+
     const { id, hash } = extraData;
 
     const { data } = await sendRequest({
@@ -93,6 +116,8 @@ const anime = {
     });
   },
   _search: async (query) => {
+    await anime.getBaseUrl();
+
     const { data: response } = await sendRequest(
       `${anime.baseUrl}/tim-kiem/${encodeURIComponent(
         query.toLowerCase()
