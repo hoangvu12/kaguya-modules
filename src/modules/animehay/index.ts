@@ -2,6 +2,7 @@ import { Anime, Episode, SearchResult, VideoServer } from "../../types";
 
 interface WindowAnime extends Anime {
   baseUrl: string;
+  hasGotBaseUrl: boolean;
   _totalSearch: (media: {
     id: number;
     title: {
@@ -17,12 +18,32 @@ interface WindowAnime extends Anime {
   ) => Promise<SearchResult[]>;
   _urlToId: (url: string) => string;
   _getFirePlayerUrl: (url: string) => Promise<string>;
+  getBaseURL: () => Promise<void>;
 }
 
 const anime: WindowAnime = {
-  baseUrl: "https://animehay.blog",
+  hasGotBaseUrl: false,
+  baseUrl: "",
+  async getBaseURL() {
+    if (anime.hasGotBaseUrl) return;
 
+    const { data: text } = await sendRequest("https://animehay.tv");
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(text, "text/html");
+
+    let href = doc.querySelector(".bt-link")?.getAttribute("href");
+
+    if (!href) return;
+
+    if (href.endsWith("/")) href = href.slice(0, -1);
+
+    anime.baseUrl = href;
+    anime.hasGotBaseUrl = true;
+  },
   getId: async ({ media }) => {
+    await anime.getBaseURL();
+
     const searchResults = await anime._totalSearch(media);
 
     sendResponse({
@@ -31,6 +52,8 @@ const anime: WindowAnime = {
   },
 
   getEpisodes: async ({ animeId }) => {
+    await anime.getBaseURL();
+
     const { data: text } = await sendRequest(
       `${anime.baseUrl}/thong-tin-phim/a-${animeId}.html`
     );
@@ -68,6 +91,8 @@ const anime: WindowAnime = {
   },
 
   loadVideoServers: async ({ episodeId }) => {
+    await anime.getBaseURL();
+
     const { data: text } = await sendRequest(
       `${anime.baseUrl}/xem-phim/a-${episodeId}.html`
     );
@@ -101,6 +126,8 @@ const anime: WindowAnime = {
   },
 
   loadVideoContainer: async ({ name, extraData }) => {
+    await anime.getBaseURL();
+
     const { link } = extraData as { link: string };
 
     if (name === "FBO") {
@@ -159,12 +186,16 @@ const anime: WindowAnime = {
   },
 
   search: async ({ query }) => {
+    await anime.getBaseURL();
+
     const searchResults = await anime._search(query);
 
     sendResponse(searchResults);
   },
 
   _search: async (query) => {
+    await anime.getBaseURL();
+
     const { data } = await sendRequest({
       url: `${anime.baseUrl}/api`,
       headers: {
