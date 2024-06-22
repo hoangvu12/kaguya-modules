@@ -110,6 +110,8 @@ const anime: WindowAnime = {
         name = "FBO";
       } else if (url.includes("suckplayer.xyz")) {
         name = "VPRO";
+      } else if (url.includes("rapovideo.xyz")) {
+        name = "Tik";
       } else {
         continue;
       }
@@ -130,7 +132,7 @@ const anime: WindowAnime = {
 
     const { link } = extraData as { link: string };
 
-    if (name === "FBO") {
+    if (name === "FBO" || name === "Tik") {
       sendResponse({
         videos: [
           {
