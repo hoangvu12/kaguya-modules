@@ -64,7 +64,8 @@ const anime: WindowAnime = {
           },
         };
       })
-      .filter(Boolean);
+      .filter(Boolean)
+      .sort((a, b) => Number(a.number) - Number(b.number));
 
     sendResponse(episodeList);
   },
