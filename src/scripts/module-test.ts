@@ -92,7 +92,7 @@ const checkGetEpisodesFunction = async (
 
   const data = await executeCode<z.infer<typeof GetEpisodesResultSchema>>(
     "anime.getEpisodes",
-    { animeId: input.data }
+    { animeId: input.data, extraData: input.extraData }
   );
 
   const validation = GetEpisodesResultSchema.safeParse(data);
