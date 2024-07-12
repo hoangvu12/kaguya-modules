@@ -6,7 +6,7 @@ export type FileUrl = {
 export type Subtitle = {
   language: string;
   file: FileUrl;
-  format: "vtt" | "ass" | "srt";
+  format?: "vtt" | "ass" | "srt";
 };
 
 export type Timestamp = {
