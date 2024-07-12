@@ -1,10 +1,9 @@
-import {
-  type Anime,
-  type Episode,
-  type SearchResult,
-  type VideoServer,
-  type Subtitle,
-  type VideoContainer,
+import type {
+  Anime,
+  SearchResult,
+  Subtitle,
+  VideoContainer,
+  VideoServer,
 } from "../../types";
 
 interface WindowAnime extends Anime {
@@ -22,11 +21,11 @@ interface WindowAnime extends Anime {
     query: string,
     shouldRemoveDuplicates?: boolean
   ) => Promise<SearchResult[]>;
-  _extractKey: (id: number) => Promise<string>;
+  _servers: Record<number, string>;
 }
 
 const anime: WindowAnime = {
-  baseUrl: "https://kaido.to",
+  baseUrl: "https://aniwatch-api-72oo.onrender.com",
 
   getId: async ({ media }) => {
     const searchResults = await anime._totalSearch(media);
@@ -37,37 +36,23 @@ const anime: WindowAnime = {
   },
 
   getEpisodes: async ({ animeId }) => {
-    const requestUrl = `${anime.baseUrl}/ajax/episode/list/${animeId}`;
-    const { data } = await sendRequest<{ html: string }>(requestUrl);
-    const res = data.html;
+    const { data } = await sendRequest<{
+      episodes: {
+        title: string;
+        episodeId: string;
+        number: number;
+        isFiller: boolean;
+      }[];
+    }>(`${anime.baseUrl}/anime/episodes/` + animeId);
 
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(res, "text/html");
-
-    const epItemsDOM = Array.from(doc.querySelectorAll(".ep-item"));
-
-    const episodes: Episode[] = epItemsDOM
-      .map((el) => {
-        const id = el.getAttribute("data-id");
-        const number = el.getAttribute("data-number");
-        const title = el.getAttribute("data-title") || undefined;
-
-        if (!id || number === null || number === undefined) {
-          return null;
-        }
-
-        return {
-          id,
-          number,
-          title,
-          extra: {
-            animeId,
-          },
-        };
-      })
-      .filter(Boolean);
-
-    sendResponse(episodes);
+    sendResponse(
+      data?.episodes?.map((ep) => ({
+        id: ep.episodeId.replace("?ep=", "questionmarkep="),
+        number: ep.number.toString(),
+        title: ep.title,
+        isFiller: ep.isFiller,
+      }))
+    );
   },
 
   search: async ({ query }) => {
@@ -76,69 +61,72 @@ const anime: WindowAnime = {
     sendResponse(searchResults);
   },
 
-  loadVideoServers: async ({ episodeId, extraData }) => {
-    if (!extraData?.animeId) {
-      sendResponse([]);
-      return;
-    }
+  loadVideoServers: async ({ episodeId }) => {
+    const newEpisodeId = episodeId.replace("questionmarkep=", "?ep=");
 
-    const { data: json } = await sendRequest<{ html: string }>(
-      `${anime.baseUrl}/ajax/episode/servers?episodeId=${episodeId}`
-    );
+    const { data } = await sendRequest<{
+      sub: {
+        serverName: string;
+        serverId: number;
+      }[];
+      dub: {
+        serverName: string;
+        serverId: number;
+      }[];
+      episodeId: string;
+      episodeNo: number;
+    }>(`${anime.baseUrl}/anime/servers?episodeId=` + newEpisodeId);
 
-    const html = json.html;
+    const subServers = data.sub.map((server) => {
+      const serverName = anime._servers[server.serverId] || "vidcloud";
 
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
+      return {
+        name: `sub-${serverName}`,
+        embed: "",
+        extraData: {
+          id: newEpisodeId,
+          serverName: serverName.toString(),
+          category: "sub",
+        },
+      };
+    });
 
-    const serverItems = Array.from(
-      doc.querySelectorAll(".servers-sub .server-item")
-    );
+    const dubServers = data.dub.map((server) => {
+      const serverName = anime._servers[server.serverId] || "vidcloud";
 
-    const servers: VideoServer[] = serverItems
-      .map((el) => {
-        const id = el.getAttribute("data-id") || undefined;
-        const serverId = el.getAttribute("data-server-id") || undefined;
+      return {
+        name: `dub-${serverName}`,
+        embed: "",
+        extraData: {
+          id: newEpisodeId,
+          serverName: serverName.toString(),
+          category: "dub",
+        },
+      };
+    });
 
-        const name = el.textContent?.trim();
-
-        if (!name || !id || !serverId) return null;
-
-        return {
-          name,
-          extraData: {
-            id,
-            serverId,
-          },
-        };
-      })
-      .filter(Boolean);
-
-    sendResponse(servers);
+    sendResponse([...subServers, ...dubServers]);
   },
 
   async loadVideoContainer(videoServer: VideoServer) {
-    await loadScript(
-      "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"
-    );
+    const episodeId = videoServer.extraData?.id!;
+    const serverName = videoServer.extraData?.serverName!;
+    const category = videoServer.extraData?.category!;
 
-    if (!videoServer?.extraData?.id) {
-      sendResponse({
-        videos: [],
-        subtitles: [],
-        timestamps: [],
-      });
-
-      return;
+    if (!episodeId || !serverName || !category) {
+      return sendResponse(null);
     }
 
-    const requestUrl = `${anime.baseUrl}/ajax/episode/sources?id=${videoServer.extraData.id}`;
-
-    const { data } = await sendRequest<{ link: string }>(requestUrl);
-
-    const sources = data.link;
-
-    const { origin } = new URL(sources);
+    const { data } = await sendRequest<{
+      tracks: { file: string; kind: string; label: string }[];
+      intro: { start: number; end: number };
+      outro: { start: number; end: number };
+      sources: { url: string; type: string }[];
+      anilistID: number;
+      malID: number;
+    }>(
+      `${anime.baseUrl}/anime/episode-srcs?id=${episodeId}&server=${serverName}&category=${category}`
+    );
 
     const container: VideoContainer = {
       videos: [],
@@ -146,131 +134,83 @@ const anime: WindowAnime = {
       timestamps: [],
     };
 
-    const sourceIdArray = sources.split("/");
-    const sourceId = sourceIdArray[sourceIdArray.length - 1].split("?")[0];
-
-    const getSourcesUrl = `${origin}/ajax/embed-6-v2/getSources?id=${sourceId}`;
-
-    const { data: data2 } = await sendRequest<{
-      sources: any[] | any;
-      tracks: any[];
-      intro: any;
-      outro: any;
-    }>(getSourcesUrl);
-
-    if (!data2) {
-      sendResponse(container);
-
-      return;
-    }
-
-    const subtitles: Subtitle[] = data2?.tracks
-      ?.filter((track: any) => track.kind === "captions")
-      .map((track: any) => ({
+    const subtitles: Subtitle[] = data?.tracks
+      ?.filter((track) => track.kind === "captions")
+      .map((track) => ({
         file: { url: track.file },
         language: track.label,
-        format: "vtt",
       }));
 
     container.subtitles = subtitles;
+    container.timestamps = [];
 
-    if (data2?.intro) {
-      container.timestamps?.push({
+    if (data?.intro) {
+      container.timestamps.push({
         type: "Intro",
-        startTime: data2.intro.start,
-        endTime: data2.intro.end,
+        startTime: data.intro.start,
+        endTime: data.intro.end,
       });
     }
 
-    if (data2?.outro) {
-      container.timestamps?.push({
+    if (data?.outro) {
+      container.timestamps.push({
         type: "Outro",
-        startTime: data2.outro.start,
-        endTime: data2.outro.end,
+        startTime: data.outro.start,
+        endTime: data.outro.end,
       });
     }
 
-    if (Array.isArray(data2?.sources)) {
-      container.videos.push({
-        file: { url: (data2?.sources as any[])?.[0]?.file },
-        format: "hls",
+    const getOrigin = (url: string): string => {
+      const match = url.match(/^(https?:\/\/[^/]+)/);
+      return match ? match[1] : "";
+    };
+
+    if (Array.isArray(data?.sources)) {
+      data?.sources?.forEach((source) => {
+        const sourceOrigin = getOrigin(source.url);
+
+        container.videos.push({
+          file: { url: source.url, headers: { Referer: sourceOrigin } },
+          format: source.type as any,
+        });
       });
 
-      sendResponse(container);
-
-      return;
-    }
-
-    let decryptKey = await anime._extractKey(0);
-    let encryptedURL = data2.sources;
-
-    try {
-      const encryptedURLTemp = encryptedURL.split("");
-
-      let key = "";
-
-      for (const index of decryptKey as any) {
-        for (let i = index[0]; i < index[1]; i++) {
-          key += encryptedURLTemp[i];
-          encryptedURLTemp[i] = null;
-        }
-      }
-
-      decryptKey = key;
-      encryptedURL = encryptedURLTemp.filter(Boolean).join("");
-
-      // @ts-expect-error CryptoJS is loaded from loadScript
-      const Crypto = CryptoJS as any;
-
-      const parseSources = JSON.parse(
-        Crypto.AES.decrypt(encryptedURL, decryptKey as string).toString(
-          Crypto.enc.Utf8
-        )
-      ) as any;
-
-      container.videos.push({
-        file: { url: parseSources?.[0]?.file },
-        format: "hls",
-      });
-    } catch (err) {
-      console.error(err);
+      // container.videos.push({
+      //   file: { url: data?.sources?.[0]?.url },
+      //   format: "hls",
+      // });
     }
 
     sendResponse(container);
   },
 
   async _search(query: string): Promise<SearchResult[]> {
-    const { data: searchHTML } = await sendRequest<string>(
-      `${anime.baseUrl}/search?keyword=${encodeURIComponent(query)}`
-    );
+    if (!query) return [];
 
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(searchHTML, "text/html");
+    if (query === "null") return [];
 
-    const itemsDOM = Array.from(doc.querySelectorAll(".flw-item"));
+    const { data } = await sendRequest<{
+      animes: {
+        id: string;
+        name: string;
+        poster: string;
+        duration: string;
+        type: string;
+        rating: string;
+        episodes: {
+          sub: number;
+          dub: number;
+        }[];
+      }[];
+    }>(`${anime.baseUrl}/anime/search?q=` + encodeURIComponent(query));
 
-    const searchResults: SearchResult[] = itemsDOM
-      .map((el) => {
-        const aTag = el.querySelector("a");
-
-        if (!aTag) return null;
-
-        const animeName = aTag.getAttribute("title");
-        const animeId = aTag.getAttribute("data-id");
-        const src = el.querySelector("img")?.getAttribute("data-src");
-
-        if (!animeId || !animeName || !src) return null;
-
-        return {
-          id: animeId,
-          thumbnail: src,
-          title: animeName,
-        };
-      })
-      .filter(Boolean);
-
-    return searchResults;
+    return data?.animes?.map((item) => ({
+      id: item.id,
+      thumbnail: item.poster,
+      title: item.name,
+    }));
   },
+
   async _totalSearch(media) {
     const titles = Array.from(
       new Set([media?.title?.english, media?.title?.romaji])
@@ -292,12 +232,10 @@ const anime: WindowAnime = {
 
     return [];
   },
-
-  async _extractKey(id: number) {
-    const { data: key } = await sendRequest<string>(
-      `http://zoro-keys.freeddns.org/keys/e${id}/key.txt`
-    );
-
-    return key;
+  _servers: {
+    4: "vidstreaming",
+    1: "vidcloud",
+    5: "streamsb",
+    3: "streamtape",
   },
 };
