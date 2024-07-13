@@ -361,8 +361,16 @@ const anime: WindowAnime = {
 
     if (subtitles?.length) {
       container.subtitles = subtitles.map((sub) => {
+        let url = "";
+
+        if (sub.url.startsWith("/subtitles")) {
+          url = `https://sudatchi.com${sub.url}`;
+        } else {
+          url = `https://ipfs.animeui.com${sub.url}`;
+        }
+
         return {
-          file: { url: `https://ipfs.animeui.com${sub.url}` },
+          file: { url },
           language: sub.SubtitlesName.name,
           format: "ass",
         };
