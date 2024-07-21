@@ -66,10 +66,27 @@ const anime: WindowAnime = {
 
     sendResponse([
       {
-        name: "Server",
+        name: "Sub",
         embed: "",
         extraData: {
           id: newEpisodeId,
+          category: "sub",
+        },
+      },
+      {
+        name: "Dub",
+        embed: "",
+        extraData: {
+          id: newEpisodeId,
+          category: "dub",
+        },
+      },
+      {
+        name: "Raw",
+        embed: "",
+        extraData: {
+          id: newEpisodeId,
+          category: "raw",
         },
       },
     ]);
@@ -139,7 +156,7 @@ const anime: WindowAnime = {
   async loadVideoContainer(videoServer: VideoServer) {
     const episodeId = videoServer.extraData?.id!;
     // const serverName = videoServer.extraData?.serverName!;
-    // const category = videoServer.extraData?.category!;
+    const category = videoServer.extraData?.category!;
 
     // if (!episodeId || !serverName || !category) {
     //   return sendResponse(null);
@@ -163,7 +180,9 @@ const anime: WindowAnime = {
       sources: { url: string; type: string }[];
       anilistID: number;
       malID: number;
-    }>(`${anime.baseUrl}/anime/episode-srcs?id=${episodeId}`);
+    }>(
+      `${anime.baseUrl}/anime/episode-srcs?id=${episodeId}&category=${category}`
+    );
 
     const container: VideoContainer = {
       videos: [],
