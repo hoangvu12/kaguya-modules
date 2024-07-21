@@ -64,58 +64,97 @@ const anime: WindowAnime = {
   loadVideoServers: async ({ episodeId }) => {
     const newEpisodeId = episodeId.replace("questionmarkep=", "?ep=");
 
-    const { data } = await sendRequest<{
-      sub: {
-        serverName: string;
-        serverId: number;
-      }[];
-      dub: {
-        serverName: string;
-        serverId: number;
-      }[];
-      episodeId: string;
-      episodeNo: number;
-    }>(`${anime.baseUrl}/anime/servers?episodeId=` + newEpisodeId);
-
-    const subServers = data.sub.map((server) => {
-      const serverName = anime._servers[server.serverId] || "vidcloud";
-
-      return {
-        name: `sub-${serverName}`,
+    sendResponse([
+      {
+        name: "Server",
         embed: "",
         extraData: {
           id: newEpisodeId,
-          serverName: serverName.toString(),
-          category: "sub",
         },
-      };
-    });
+      },
+    ]);
 
-    const dubServers = data.dub.map((server) => {
-      const serverName = anime._servers[server.serverId] || "vidcloud";
+    // const { data } = await sendRequest<{
+    //   sub: {
+    //     serverName: string;
+    //     serverId: number;
+    //   }[];
+    //   dub: {
+    //     serverName: string;
+    //     serverId: number;
+    //   }[];
+    //   raw: {
+    //     serverName: string;
+    //     serverId: number;
+    //   }[];
+    //   episodeId: string;
+    //   episodeNo: number;
+    // }>(`${anime.baseUrl}/anime/servers?episodeId=` + newEpisodeId);
 
-      return {
-        name: `dub-${serverName}`,
-        embed: "",
-        extraData: {
-          id: newEpisodeId,
-          serverName: serverName.toString(),
-          category: "dub",
-        },
-      };
-    });
+    // const subServers = data.sub.map((server) => {
+    //   const serverName = anime._servers[server.serverId] || "vidcloud";
 
-    sendResponse([...subServers, ...dubServers]);
+    //   return {
+    //     name: `sub-${serverName}`,
+    //     embed: "",
+    //     extraData: {
+    //       id: newEpisodeId,
+    //       serverName: serverName.toString(),
+    //       category: "sub",
+    //     },
+    //   };
+    // });
+
+    // const dubServers = data.dub.map((server) => {
+    //   const serverName = anime._servers[server.serverId] || "vidcloud";
+
+    //   return {
+    //     name: `dub-${serverName}`,
+    //     embed: "",
+    //     extraData: {
+    //       id: newEpisodeId,
+    //       serverName: serverName.toString(),
+    //       category: "dub",
+    //     },
+    //   };
+    // });
+
+    // const rawServers = data.raw.map((server) => {
+    //   const serverName = anime._servers[server.serverId] || "vidcloud";
+
+    //   return {
+    //     name: `raw-${serverName}`,
+    //     embed: "",
+    //     extraData: {
+    //       id: newEpisodeId,
+    //       serverName: serverName.toString(),
+    //       category: "raw",
+    //     },
+    //   };
+    // });
+
+    // sendResponse([...subServers, ...dubServers, ...rawServers]);
   },
 
   async loadVideoContainer(videoServer: VideoServer) {
     const episodeId = videoServer.extraData?.id!;
-    const serverName = videoServer.extraData?.serverName!;
-    const category = videoServer.extraData?.category!;
+    // const serverName = videoServer.extraData?.serverName!;
+    // const category = videoServer.extraData?.category!;
 
-    if (!episodeId || !serverName || !category) {
-      return sendResponse(null);
-    }
+    // if (!episodeId || !serverName || !category) {
+    //   return sendResponse(null);
+    // }
+
+    // const { data } = await sendRequest<{
+    //   tracks: { file: string; kind: string; label: string }[];
+    //   intro: { start: number; end: number };
+    //   outro: { start: number; end: number };
+    //   sources: { url: string; type: string }[];
+    //   anilistID: number;
+    //   malID: number;
+    // }>(
+    //   `${anime.baseUrl}/anime/episode-srcs?id=${episodeId}&server=${serverName}&category=${category}`
+    // );
 
     const { data } = await sendRequest<{
       tracks: { file: string; kind: string; label: string }[];
@@ -124,9 +163,7 @@ const anime: WindowAnime = {
       sources: { url: string; type: string }[];
       anilistID: number;
       malID: number;
-    }>(
-      `${anime.baseUrl}/anime/episode-srcs?id=${episodeId}&server=${serverName}&category=${category}`
-    );
+    }>(`${anime.baseUrl}/anime/episode-srcs?id=${episodeId}`);
 
     const container: VideoContainer = {
       videos: [],
@@ -145,7 +182,7 @@ const anime: WindowAnime = {
     container.timestamps = [];
 
     if (data?.intro) {
-      container.timestamps.push({
+      container.timestamps?.push({
         type: "Intro",
         startTime: data.intro.start,
         endTime: data.intro.end,
@@ -153,7 +190,7 @@ const anime: WindowAnime = {
     }
 
     if (data?.outro) {
-      container.timestamps.push({
+      container.timestamps?.push({
         type: "Outro",
         startTime: data.outro.start,
         endTime: data.outro.end,
