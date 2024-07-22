@@ -1,0 +1,12 @@
+{
+    "id": "ophim",
+    "name": "OPhim",
+    "version": "0.0.1",
+    "languages": [
+        "Tiếng Việt"
+    ],
+    "type": "anime",
+    "info": {
+        "author": "hoangvu12"
+    }
+}
