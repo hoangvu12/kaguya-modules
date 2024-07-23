@@ -206,7 +206,9 @@ const anime: WindowAnime = {
       const titleElement = post.querySelector(".entry-title");
       const title = titleElement?.textContent?.trim() || "";
 
-      const postId = post.className.split(" ").slice(-1)[0] || "";
+      const postId =
+        post.className.split(" ")?.slice(-1)?.[0]?.split("-")?.slice(-1)?.[0] ||
+        "";
 
       return {
         id,
