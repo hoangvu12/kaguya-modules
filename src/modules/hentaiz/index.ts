@@ -25,7 +25,7 @@ interface WindowAnime extends Anime {
 }
 
 const anime: WindowAnime = {
-  baseUrl: "https://hentaiz.bz",
+  baseUrl: "https://ihentai.bio",
   getId: async ({ media }) => {
     const searchResults = await anime._totalSearch(media);
 
@@ -71,13 +71,13 @@ const anime: WindowAnime = {
     const MAX_PAGE = 3;
 
     const requestData = async (page: number): Promise<any> => {
-      const { data: json } = await sendRequest(
-        `${
+      const { data: json } = await sendRequest({
+        url: `${
           anime.baseUrl
         }/api/search?page=${page}&limit=${LIMIT}&orderby=date&order=desc&s=${encodeURIComponent(
           query
-        )}`
-      );
+        )}`,
+      });
 
       let searchResults = json.videos.map((video: any) => {
         return {
@@ -134,9 +134,9 @@ const anime: WindowAnime = {
   async loadVideoContainer({ extraData }) {
     if (!extraData?.episodeId) return;
 
-    const { data: text } = await sendRequest(
-      `${anime.baseUrl}/${extraData.episodeId}`
-    );
+    const { data: text } = await sendRequest({
+      url: `${anime.baseUrl}/${extraData.episodeId}`,
+    });
 
     const iframeSrc = anime._parseBetween(text, '<iframe src="', '"');
 
