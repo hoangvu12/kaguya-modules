@@ -43,8 +43,8 @@ importers:
         specifier: ^2.4.9
         version: 2.4.9
       '@types/web':
-        specifier: ^0.0.157
-        version: 0.0.157
+        specifier: ^0.0.158
+        version: 0.0.158
       '@typescript-eslint/eslint-plugin':
         specifier: ^5.61.0
         version: 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0)(typescript@5.5.4)
@@ -286,8 +286,8 @@ packages:
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
 
-  '@types/web@0.0.157':
-    resolution: {integrity: sha512-erqzRlWBxaV7qI0g5rIkHRRxQ3kKmqqhokqgnSy3UEQYIl+5qNCU7DwdPaOke3ZHRXmbrjpGgSc4bjM4ItSDnw==}
+  '@types/web@0.0.158':
+    resolution: {integrity: sha512-ndfEoYZm2HOEaJCfE285P0rqqxwPUMtzd5jhPfyizCaBRDFzPk6u/VsyCe2Q0A2Ii8AEXfINkwqR8oUQeQFqrA==}
 
   '@typescript-eslint/eslint-plugin@5.62.0':
     resolution: {integrity: sha512-TiZzBSJja/LbhNPvk6yc0JrX9XqhQ0hdh6M2svYfsHGejaKFIAGd9MQ+ERIMzLGlN/kZoYIgdxFV0PuljTKXag==}
@@ -1838,7 +1838,7 @@ snapshots:
 
   '@types/tough-cookie@4.0.5': {}
 
-  '@types/web@0.0.157': {}
+  '@types/web@0.0.158': {}
 
   '@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0)(typescript@5.5.4)':
     dependencies:
