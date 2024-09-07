@@ -366,7 +366,7 @@ const anime: WindowAnime = {
         if (sub.url.startsWith("/subtitles")) {
           url = `https://sudatchi.com${sub.url}`;
         } else {
-          url = `https://ipfs.animeui.com${sub.url}`;
+          url = `https://gboesk298le91ct41kibaonc7o.ingress.akashprovid.com${sub.url}`;
         }
 
         return {
