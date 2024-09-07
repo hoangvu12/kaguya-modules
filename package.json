@@ -21,19 +21,19 @@
     "dist/"
   ],
   "scripts": {
-    "build": "pnpm run clean && pnpm run lint && tsc",
+    "build": "npm run clean && npm run lint && tsc",
     "clean": "node -e \"var { rmdirSync, existsSync } = require('fs'), path = require('path'); ['./.nyc_output', './coverage', './dist'].forEach(fPath => {if (existsSync(path.join(__dirname, fPath))) rmdirSync(path.join(__dirname, fPath), { recursive: true })}); process.exit(0);\"",
-    "clean:all": "pnpm run clean && (rm -r ./node_modules || true)",
+    "clean:all": "npm run clean && (rm -r ./node_modules || true)",
     "lint": "eslint --ext .ts --fix src/**/*.ts",
-    "preversion": "pnpm run build",
-    "prepare": "pnpm run build",
+    "preversion": "npm run build",
+    "prepare": "npm run build",
     "serve": "nodemon ./src/index.ts",
     "upgrade": "npx npm-check -u",
     "watch": "tsc -w -p tsconfig.json",
-    "module:validate": "pnpm run build && node ./dist/scripts/module-validate.js",
-    "module:test": "pnpm run build && node ./dist/scripts/module-test.js",
-    "module:build": "pnpm run build && node ./dist/scripts/module-build.js",
-    "module:index": "pnpm run build && node ./dist/scripts/module-index.js"
+    "module:validate": "npm run build && node ./dist/scripts/module-validate.js",
+    "module:test": "npm run build && node ./dist/scripts/module-test.js",
+    "module:build": "npm run build && node ./dist/scripts/module-build.js",
+    "module:index": "npm run build && node ./dist/scripts/module-index.js"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.6.1",
