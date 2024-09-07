@@ -32,7 +32,7 @@ interface WindowAnime extends Anime {
 }
 
 const anime: WindowAnime = {
-  baseUrl: "https://anime47.biz",
+  baseUrl: "https://anime47.de",
 
   getId: async ({ media }) => {
     const searchResults = await anime._totalSearch(media);
