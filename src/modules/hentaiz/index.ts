@@ -25,7 +25,7 @@ interface WindowAnime extends Anime {
 }
 
 const anime: WindowAnime = {
-  baseUrl: "https://ihentai.bio",
+  baseUrl: "https://ihentai.day",
   getId: async ({ media }) => {
     const searchResults = await anime._totalSearch(media);
 
