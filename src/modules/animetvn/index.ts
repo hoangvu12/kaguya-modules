@@ -105,7 +105,7 @@ const anime: WindowAnime = {
   loadVideoServers: async ({ episodeId }) => {
     await anime._getCookiesAndCsrf();
 
-    const allowServers = ["TVN", "FB", "LOT"];
+    const allowServers = ["FB", "LOT"];
 
     type Response = {
       success: boolean;
@@ -167,37 +167,37 @@ const anime: WindowAnime = {
       withCredentials: false,
     });
 
-    if (name === "TVN") {
-      const { data } = await sendRequest(source.link);
+    // if (name === "TVN") {
+    //   const { data } = await sendRequest(source.link);
 
-      const idUser = anime._parseBetween(data, 'var idUser = "', '"');
-      const idfile = anime._parseBetween(data, 'var idfile = "', '"');
+    //   const idUser = anime._parseBetween(data, 'var idUser = "', '"');
+    //   const idfile = anime._parseBetween(data, 'var idfile = "', '"');
 
-      const postUrl = `https://api-plhq.playhbq.xyz/apiv4/${idUser}/${idfile}`;
+    //   const postUrl = `https://api-plhq.playhbq.xyz/apiv4/${idUser}/${idfile}`;
 
-      const { data: streamData } = await sendRequest({
-        url: postUrl,
-        method: "post",
-        data: `referrer=${encodeURIComponent(anime.baseUrl)}&typeend=html`,
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      });
+    //   const { data: streamData } = await sendRequest({
+    //     url: postUrl,
+    //     method: "post",
+    //     data: `referrer=${encodeURIComponent(anime.baseUrl)}&typeend=html`,
+    //     headers: {
+    //       "Content-Type": "application/x-www-form-urlencoded",
+    //     },
+    //   });
 
-      if (!streamData?.data) {
-        sendResponse({
-          videos: [],
-        });
+    //   if (!streamData?.data) {
+    //     sendResponse({
+    //       videos: [],
+    //     });
 
-        return;
-      }
+    //     return;
+    //   }
 
-      sendResponse({
-        videos: [{ file: { url: streamData?.data } }],
-      });
+    //   sendResponse({
+    //     videos: [{ file: { url: streamData?.data } }],
+    //   });
 
-      return;
-    }
+    //   return;
+    // }
 
     if (name === "FB") {
       const { data } = await sendRequest(source.link);
