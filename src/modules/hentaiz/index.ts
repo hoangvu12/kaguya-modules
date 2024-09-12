@@ -61,7 +61,7 @@ const anime: WindowAnime = {
           "/",
           ""
         ),
-        thumbnail: searchResult?.extra?.poster,
+        thumbnail: searchResult?.extra?.bigThumbnail,
       }))
     );
   },
@@ -71,24 +71,104 @@ const anime: WindowAnime = {
     const MAX_PAGE = 3;
 
     const requestData = async (page: number): Promise<any> => {
-      const { data: json } = await sendRequest({
-        url: `${
-          anime.baseUrl
-        }/api/search?page=${page}&limit=${LIMIT}&orderby=date&order=desc&s=${encodeURIComponent(
-          query
-        )}`,
-      });
+      const encodedQuery = encodeURIComponent(query);
 
-      let searchResults = json.videos.map((video: any) => {
+      const { data: json } = await sendRequest(
+        `https://bunny-cdn.com/api/videos?fields%5B0%5D=title&fields%5B1%5D=slug&fields%5B2%5D=views&filters%5B%24or%5D%5B0%5D%5Btitle%5D%5B%24contains%5D=${encodedQuery}&filters%5B%24or%5D%5B1%5D%5BotherTitles%5D%5B%24contains%5D=${encodedQuery}&filters%5B%24or%5D%5B2%5D%5Bcategories%5D%5Bname%5D%5B%24contains%5D=${encodedQuery}&filters%5B%24or%5D%5B3%5D%5Btags%5D%5Bname%5D%5B%24contains%5D=${encodedQuery}&filters%5B%24or%5D%5B4%5D%5Bstudios%5D%5Bname%5D%5B%24contains%5D=${encodedQuery}&filters%5B%24or%5D%5B5%5D%5Bseries%5D%5Bname%5D%5B%24contains%5D=${encodedQuery}&filters%5B%24or%5D%5B6%5D%5Byear%5D%5Bname%5D%5B%24contains%5D=${encodedQuery}&sort%5B0%5D=publishedAt%3Adesc&sort%5B1%5D=slug%3Adesc&pagination%5Bpage%5D=${page}&pagination%5BpageSize%5D=${LIMIT}&populate%5B0%5D=thumbnail&populate%5B1%5D=bigThumbnail`
+      );
+
+      const dataWithTypes = json as {
+        data: Array<{
+          id: number;
+          publishedAt: string;
+          slug: string;
+          title: string;
+          views: number;
+          thumbnail: {
+            id: number;
+            name: string;
+            alternativeText: any;
+            caption: any;
+            width: number;
+            height: number;
+            formats: {
+              thumbnail: {
+                name: string;
+                hash: string;
+                ext: string;
+                mime: string;
+                path: any;
+                width: number;
+                height: number;
+                size: number;
+                sizeInBytes: number;
+                url: string;
+              };
+            };
+            hash: string;
+            ext: string;
+            mime: string;
+            size: number;
+            url: string;
+            previewUrl: any;
+            provider: string;
+            provider_metadata: any;
+            createdAt: string;
+            updatedAt: string;
+          };
+          bigThumbnail: {
+            id: number;
+            name: string;
+            alternativeText: any;
+            caption: any;
+            width: number;
+            height: number;
+            formats: {
+              thumbnail: {
+                name: string;
+                hash: string;
+                ext: string;
+                mime: string;
+                path: any;
+                width: number;
+                height: number;
+                size: number;
+                sizeInBytes: number;
+                url: string;
+              };
+            };
+            hash: string;
+            ext: string;
+            mime: string;
+            size: number;
+            url: string;
+            previewUrl: any;
+            provider: string;
+            provider_metadata: any;
+            createdAt: string;
+            updatedAt: string;
+          };
+        }>;
+        meta: {
+          pagination: {
+            page: number;
+            pageSize: number;
+            pageCount: number;
+            total: number;
+          };
+        };
+      };
+
+      let searchResults = dataWithTypes.data.map((video) => {
         return {
           id: anime
             ._dropRight(video.slug.replaceAll("/", "").split("-"))
             .join("-"),
           title: anime._dropRight(video.title.split(" ")).join(" "),
-          thumbnail: video.thumbnail,
+          thumbnail: `https://bunny-cdn.com${video.thumbnail.url}`,
           extra: {
             searchTitle: anime._dropRight(video.title.split(" ")).join(" "),
-            poster: video.poster,
+            bigThumbnail: `https://bunny-cdn.com${video.bigThumbnail.url}`,
             idWithEpisode: video.slug.replaceAll("/", ""),
           },
         };
