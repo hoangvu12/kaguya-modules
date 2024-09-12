@@ -215,7 +215,7 @@ const anime: WindowAnime = {
     if (!extraData?.episodeId) return;
 
     const { data: text } = await sendRequest({
-      url: `${anime.baseUrl}/${extraData.episodeId}`,
+      url: `${anime.baseUrl}/watch/${extraData.episodeId}`,
     });
 
     const iframeSrc = anime._parseBetween(text, '<iframe src="', '"');
