@@ -25,21 +25,23 @@ const anime: WindowAnime = {
   hasGotBaseUrl: false,
   baseUrl: "",
   async getBaseURL() {
-    if (anime.hasGotBaseUrl) return;
+    // if (anime.hasGotBaseUrl) return;
 
-    const { data: text } = await sendRequest("https://animehay.tv");
+    // const { data: text } = await sendRequest("https://animehay.tv");
 
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(text, "text/html");
+    // const parser = new DOMParser();
+    // const doc = parser.parseFromString(text, "text/html");
 
-    let href = doc.querySelector(".bt-link")?.getAttribute("href");
+    // let href = doc.querySelector(".bt-link")?.getAttribute("href");
 
-    if (!href) return;
+    // if (!href) return;
 
-    if (href.endsWith("/")) href = href.slice(0, -1);
+    // if (href.endsWith("/")) href = href.slice(0, -1);
 
-    anime.baseUrl = href;
-    anime.hasGotBaseUrl = true;
+    // anime.baseUrl = href;
+    // anime.hasGotBaseUrl = true;
+
+    anime.baseUrl = "http://77.73.70.149";
   },
   getId: async ({ media }) => {
     await anime.getBaseURL();
@@ -214,7 +216,7 @@ const anime: WindowAnime = {
     const doc = parser.parseFromString(data.result, "text/html");
 
     const linkElements = Array.from(
-      doc.querySelectorAll(`a[href^="${anime.baseUrl}"]`)
+      doc.querySelectorAll(`a[href*="/thong-tin-phim/"]`)
     );
 
     const searchResults: SearchResult[] = linkElements
