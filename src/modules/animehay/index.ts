@@ -25,23 +25,21 @@ const anime: WindowAnime = {
   hasGotBaseUrl: false,
   baseUrl: "",
   async getBaseURL() {
-    // if (anime.hasGotBaseUrl) return;
+    if (anime.hasGotBaseUrl) return;
 
-    // const { data: text } = await sendRequest("https://animehay.tv");
+    const { data: text } = await sendRequest("https://animehay.tv");
 
-    // const parser = new DOMParser();
-    // const doc = parser.parseFromString(text, "text/html");
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(text, "text/html");
 
-    // let href = doc.querySelector(".bt-link")?.getAttribute("href");
+    let href = doc.querySelector(".bt-link")?.getAttribute("href");
 
-    // if (!href) return;
+    if (!href) return;
 
-    // if (href.endsWith("/")) href = href.slice(0, -1);
+    if (href.endsWith("/")) href = href.slice(0, -1);
 
-    // anime.baseUrl = href;
-    // anime.hasGotBaseUrl = true;
-
-    anime.baseUrl = "http://77.73.70.149";
+    anime.baseUrl = href;
+    anime.hasGotBaseUrl = true;
   },
   getId: async ({ media }) => {
     await anime.getBaseURL();
