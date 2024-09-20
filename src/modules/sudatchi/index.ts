@@ -21,6 +21,7 @@ interface WindowAnime extends Anime {
     shouldRemoveDuplicates?: boolean
   ) => Promise<SearchResult[]>;
   _parseBetween: (text: string, start: string, end: string) => string;
+  _getSubtitleUrl: () => Promise<string>;
 }
 
 const anime: WindowAnime = {
@@ -360,13 +361,15 @@ const anime: WindowAnime = {
     // const fonts = data?.props?.pageProps?.episodeData?.fonts;
 
     if (subtitles?.length) {
+      const subtitleUrl = await anime._getSubtitleUrl();
+
       container.subtitles = subtitles.map((sub) => {
         let url = "";
 
         if (sub.url.startsWith("/subtitles")) {
           url = `https://sudatchi.com${sub.url}`;
         } else {
-          url = `https://gboesk298le91ct41kibaonc7o.ingress.akashprovid.com${sub.url}`;
+          url = `${subtitleUrl}${sub.url}`;
         }
 
         return {
@@ -440,6 +443,12 @@ const anime: WindowAnime = {
           url: "https://github.com/hoangvu12/kaguya-fonts/raw/master/AdobeArabic-Regular.ttf",
         },
         name: "Adobe Arabic",
+      },
+      {
+        file: {
+          url: "https://github.com/hoangvu12/kaguya-fonts/raw/master/Swiss%20721%20BT.ttf",
+        },
+        name: "Swis721 BT",
       },
     ];
 
@@ -558,5 +567,16 @@ const anime: WindowAnime = {
     strArr = strArr[1].split(end);
 
     return strArr[0];
+  },
+
+  async _getSubtitleUrl() {
+    const response = await sendRequest(
+      "https://raw.githubusercontent.com/hoangvu12/kext-domain/master/domains.json"
+    );
+    const json = (await response.data) as { [key: string]: string };
+
+    if (!json?.["sudatchi-sub"]) return "";
+
+    return json["sudatchi-sub"];
   },
 };
