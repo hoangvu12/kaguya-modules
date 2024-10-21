@@ -3,6 +3,7 @@ import { Anime, Episode, SearchResult } from "../../types";
 
 interface WindowAnime extends Anime {
   baseUrl: string;
+  hasGotBaseUrl: boolean;
   _totalSearch: (media: {
     id: number;
     title: {
@@ -23,11 +24,15 @@ interface WindowAnime extends Anime {
     unpack_chunk: (packed: string) => string;
   };
   _parseBetween: (text: string, start: string, end: string) => string;
+  getBaseURL: () => Promise<void>;
 }
 
 const anime: WindowAnime = {
-  baseUrl: "https://hhhay.tv",
+  hasGotBaseUrl: false,
+  baseUrl: "",
   getId: async ({ media }) => {
+    await anime.getBaseURL();
+
     const searchResults = await anime._totalSearch(media);
 
     sendResponse({
@@ -37,6 +42,8 @@ const anime: WindowAnime = {
   },
 
   getEpisodes: async ({ animeId, extraData }) => {
+    await anime.getBaseURL();
+
     const { data: text } = await sendRequest(`${anime.baseUrl}/${animeId}`);
 
     const parser = new DOMParser();
@@ -71,6 +78,8 @@ const anime: WindowAnime = {
   },
 
   loadVideoServers: async ({ episodeId, extraData }) => {
+    await anime.getBaseURL();
+
     if (!extraData?.animeId) return sendResponse([]);
     if (!extraData?.postId) return sendResponse([]);
 
@@ -107,6 +116,8 @@ const anime: WindowAnime = {
   },
 
   loadVideoContainer: async ({ extraData }) => {
+    await anime.getBaseURL();
+
     const embed = extraData?.embed;
 
     if (!embed) return sendResponse(null);
@@ -151,6 +162,8 @@ const anime: WindowAnime = {
   },
 
   search: async ({ query }) => {
+    await anime.getBaseURL();
+
     const searchResults = await anime._search(query);
 
     sendResponse(searchResults);
@@ -298,5 +311,24 @@ const anime: WindowAnime = {
     strArr = strArr[1].split(end);
 
     return strArr[0];
+  },
+  async getBaseURL() {
+    if (anime.hasGotBaseUrl) return;
+
+    try {
+      await sendRequest({
+        url: "https://bit.ly/hhhay",
+        maxRedirects: 0,
+      });
+    } catch (error) {
+      const redirectedUrl = (error as any).response?.headers?.["location"];
+
+      if (!redirectedUrl) return;
+
+      anime.baseUrl = redirectedUrl.endsWith("/")
+        ? redirectedUrl.slice(0, -1)
+        : redirectedUrl;
+      anime.hasGotBaseUrl = true;
+    }
   },
 };
