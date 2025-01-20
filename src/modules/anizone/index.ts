@@ -1,4 +1,4 @@
-import type { Anime, SearchResult, VideoServer } from "../../types";
+import type { Anime, SearchResult } from "../../types";
 
 interface WindowAnime extends Anime {
   baseUrl: string;
@@ -99,8 +99,7 @@ const anime: WindowAnime = {
     ]);
   },
 
-  loadVideoContainer: async (videoServer: VideoServer) => {
-    const { extraData } = videoServer;
+  loadVideoContainer: async ({ extraData }) => {
     const animeId = extraData?.animeId;
     const number = extraData?.number;
 
@@ -110,11 +109,12 @@ const anime: WindowAnime = {
       `${anime.baseUrl}/anime/${animeId}/${number}`
     );
 
-    const source = anime._parseBetween(html, 'media-player src="', '"');
+    const parser = new DOMParser().parseFromString(html, "text/html");
+
+    const source = parser.querySelector("media-player")?.getAttribute("src");
+
     const tracks = Array.from(
-      new DOMParser()
-        .parseFromString(html, "text/html")
-        .querySelectorAll("media-player track")
+      parser.querySelectorAll("media-player track")
     ).map((track) => ({
       file: { url: track.getAttribute("src") },
       language: track.getAttribute("label"),
