@@ -1,0 +1,12 @@
+{
+    "id": "anizone",
+    "name": "AniZone",
+    "version": "0.0.1",
+    "languages": [
+        "English"
+    ],
+    "type": "anime",
+    "info": {
+        "author": "hoangvu12"
+    }
+}
