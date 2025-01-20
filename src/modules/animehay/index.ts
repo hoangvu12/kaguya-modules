@@ -27,7 +27,7 @@ const anime: WindowAnime = {
   async getBaseURL() {
     if (anime.hasGotBaseUrl) return;
 
-    const { data: text } = await sendRequest("https://animehay.tv");
+    const { data: text } = await sendRequest("https://animehay.red");
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(text, "text/html");
