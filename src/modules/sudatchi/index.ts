@@ -78,7 +78,13 @@ const anime: WindowAnime = {
       themes: Array<string>;
       studio: string;
       producers: Array<string>;
-    }>(`${anime.baseUrl}/api/anime/${animeId}`);
+    }>({
+      url: `${anime.baseUrl}/api/anime/${animeId}`,
+      headers: {
+        Origin: "https://sudatchi.com",
+        Referer: "https://sudatchi.com/",
+      },
+    });
 
     const episodes = json.episodes;
 
@@ -88,6 +94,8 @@ const anime: WindowAnime = {
       episodes.map((episode) => ({
         id: `${animeId}-${episode.id}`,
         number: episode.number.toString(),
+        thumbnail: `https://sudatchi.com/api/proxy/${episode.imgUrl}`,
+        title: episode.title,
         extra: {
           number: episode.number.toString(),
           animeId,
@@ -135,14 +143,15 @@ const anime: WindowAnime = {
       timestamps: [],
     };
 
-    const { data: json } = await sendRequest<{ url: string }>(
-      `${anime.baseUrl}/api/streams?episodeId=${episodeId}`
-    );
-
-    if (!json?.url) return sendResponse(container);
-
     container.videos.push({
-      file: { url: `${anime.baseUrl}/${json.url}` },
+      file: {
+        url: `${anime.baseUrl}/api/streams?episodeId=${episodeId}`,
+        headers: {
+          Origin: "https://sudatchi.com",
+          Referer: "https://sudatchi.com/",
+        },
+      },
+      format: "hls",
     });
 
     const { data: streamJson } = await sendRequest<{
@@ -239,9 +248,13 @@ const anime: WindowAnime = {
       };
       comments: Array<any>;
       fonts: Array<string>;
-    }>(`${anime.baseUrl}/api/episode/${animeId}/${number}`);
-
-    if (!json) return sendResponse(container);
+    }>({
+      url: `${anime.baseUrl}/api/episode/${animeId}/${number}`,
+      headers: {
+        Origin: "https://sudatchi.com",
+        Referer: "https://sudatchi.com/",
+      },
+    });
 
     const subtitles = JSON.parse(streamJson?.subtitlesJson) as Array<{
       id: number;
@@ -258,19 +271,28 @@ const anime: WindowAnime = {
     // const fonts = data?.props?.pageProps?.episodeData?.fonts;
 
     if (subtitles?.length) {
-      const subtitleUrl = await anime._getSubtitleUrl();
-
       container.subtitles = subtitles.map((sub) => {
-        let url = "";
+        // let url = "";
 
-        if (sub.url.startsWith("/subtitles")) {
-          url = `https://sudatchi.com${sub.url}`;
-        } else {
-          url = `${subtitleUrl}${sub.url}`;
-        }
+        // if (sub.url.startsWith("/subtitles")) {
+        //   url = `https://sudatchi.com${sub.url}`;
+        // } else {
+        //   url = `${subtitleUrl}${sub.url}`;
+        // }
+
+        const url = `https://sudatchi.com/api/proxy/${sub.url}`.replace(
+          "/ipfs/",
+          "/"
+        );
 
         return {
-          file: { url },
+          file: {
+            url,
+            headers: {
+              Origin: "https://sudatchi.com",
+              Referer: "https://sudatchi.com/",
+            },
+          },
           language: sub.SubtitlesName.name,
           format: "ass",
         };
@@ -368,6 +390,10 @@ const anime: WindowAnime = {
       }[];
     }>({
       url: `${anime.baseUrl}/api/fetchAnime`,
+      headers: {
+        Origin: "https://sudatchi.com",
+        Referer: "https://sudatchi.com/",
+      },
       data: {
         query,
       },
@@ -417,9 +443,13 @@ const anime: WindowAnime = {
   },
 
   async _getSubtitleUrl() {
-    const response = await sendRequest(
-      "https://raw.githubusercontent.com/hoangvu12/kext-domain/master/domains.json"
-    );
+    const response = await sendRequest({
+      url: "https://raw.githubusercontent.com/hoangvu12/kext-domain/master/domains.json",
+      headers: {
+        Origin: "https://sudatchi.com",
+        Referer: "https://sudatchi.com/",
+      },
+    });
     const json = (await response.data) as { [key: string]: string };
 
     if (!json?.["sudatchi-sub"]) return "";
